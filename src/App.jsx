@@ -32,7 +32,10 @@ const makeTab = (title = 'New Tab') => ({
   reloadKey: 0,
 });
 
+const makeInitialTab = () => makeTab('Start');
+
 function LinuxHubShell() {
+  const firstTab = useMemo(() => makeInitialTab(), []);
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('Booting proxy runtime...');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,16 +43,25 @@ function LinuxHubShell() {
   const [theme, setTheme] = useState('noir');
   const [device, setDevice] = useState(() => detectDevice());
   const [page, setPage] = useState(() => (window.location.pathname === '/algebra' ? 'browser' : 'home'));
-  const [tabs, setTabs] = useState([makeTab('Start')]);
-  const [activeTabId, setActiveTabId] = useState(null);
+  const [tabs, setTabs] = useState([firstTab]);
+  const [activeTabId, setActiveTabId] = useState(firstTab.id);
   const [engine, setEngine] = useState('duckduckgo');
   const frameRef = useRef(null);
 
-  useReg();
+  const { ready: proxyReady, error: proxyError } = useReg();
 
   useEffect(() => {
-    setStatus('Proxy ready. Search freely in Linux Hub.');
-  }, []);
+    if (proxyError) {
+      setStatus(proxyError.message || 'Proxy failed to initialize.');
+      return;
+    }
+
+    if (proxyReady) {
+      setStatus('Proxy ready. Search freely in Linux Hub.');
+    } else {
+      setStatus('Booting proxy runtime...');
+    }
+  }, [proxyReady, proxyError]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -84,9 +96,13 @@ function LinuxHubShell() {
     }
 
     setIsSubmitting(true);
-    setStatus('Opening your request through Linux Hub...');
+    setStatus(proxyReady ? 'Opening your request through Linux Hub...' : 'Proxy still booting, please wait...');
 
     try {
+      if (!proxyReady) {
+        throw new Error('Proxy is still starting. Try again in a second.');
+      }
+
       const chosenEngine = SEARCH_ENGINES[engine] || SEARCH_ENGINES.duckduckgo;
       const target = process(value, false, 'scr', chosenEngine.url);
 
@@ -94,9 +110,10 @@ function LinuxHubShell() {
         throw new Error('Enter a URL or a search term.');
       }
 
-      setTabs((currentTabs) =>
-        currentTabs.map((tab) =>
-          tab.id === (activeTab?.id || activeTabId)
+      setTabs((currentTabs) => {
+        const targetTabId = activeTab?.id || activeTabId || currentTabs[0]?.id;
+        return currentTabs.map((tab) =>
+          tab.id === targetTabId
             ? {
                 ...tab,
                 title: value.slice(0, 24) || 'Tab',
@@ -104,10 +121,12 @@ function LinuxHubShell() {
                 reloadKey: Date.now(),
               }
             : tab,
-        ),
-      );
+        );
+      });
 
-      history.pushState({}, '', '/algebra');
+      if (location.pathname !== '/algebra') {
+        history.pushState({}, '', '/algebra');
+      }
       setPage('browser');
       setStatus('Loaded in embedded tab.');
     } catch (error) {
@@ -247,7 +266,7 @@ function LinuxHubShell() {
               spellCheck="false"
               aria-label="Search freely in Linux Hub"
             />
-            <button className="search-button" type="submit" aria-label="Search" disabled={isSubmitting}>
+            <button className="search-button" type="submit" aria-label="Search" disabled={isSubmitting || !proxyReady}>
               Search
             </button>
           </form>
@@ -267,7 +286,7 @@ function LinuxHubShell() {
                 spellCheck="false"
                 aria-label="Search freely in Linux Hub"
               />
-              <button className="search-button" type="submit" aria-label="Search" disabled={isSubmitting}>
+              <button className="search-button" type="submit" aria-label="Search" disabled={isSubmitting || !proxyReady}>
                 Search
               </button>
             </form>

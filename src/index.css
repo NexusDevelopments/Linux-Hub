@@ -355,6 +355,28 @@ select {
   align-items: stretch;
 }
 
+.device-mobile .tab-row {
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.device-mobile .nav-controls {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.device-mobile .tabs-strip {
+  width: 100%;
+}
+
+.device-mobile .tab-chip {
+  max-width: 60vw;
+}
+
+.device-mobile .browser-panel {
+  min-height: 62vh;
+}
+
 .device-mobile .slim-status {
   max-width: 100%;
   text-align: center;
