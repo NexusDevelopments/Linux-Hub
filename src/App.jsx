@@ -106,6 +106,7 @@ export default function App() {
   const [theme, setTheme] = useState('noir');
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [device, setDevice] = useState(() => detectDevice());
+  const [page, setPage] = useState(() => (window.location.pathname === '/algebra' ? 'browser' : 'home'));
   const [tabs, setTabs] = useState([makeTab('Start')]);
   const [activeTabId, setActiveTabId] = useState(null);
   const frameRef = useRef(null);
@@ -151,9 +152,14 @@ export default function App() {
     return () => window.removeEventListener('resize', updateDevice);
   }, []);
 
+  useEffect(() => {
+    const onPop = () => setPage(window.location.pathname === '/algebra' ? 'browser' : 'home');
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
   const statusTone = useMemo(() => (isReady ? 'status status-ready' : 'status'), [isReady]);
   const activeTab = useMemo(() => tabs.find((tab) => tab.id === activeTabId) || tabs[0], [tabs, activeTabId]);
-  const hasContent = Boolean(activeTab?.url);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -187,6 +193,8 @@ export default function App() {
         ),
       );
 
+      history.pushState({}, '', '/algebra');
+      setPage('browser');
       setStatus('Loaded in embedded tab.');
       setIsSubmitting(false);
     } catch (error) {
@@ -237,6 +245,8 @@ export default function App() {
       currentTabs.map((tab) => (tab.id === activeTab.id ? { ...tab, url: '', title: 'Start' } : tab)),
     );
     setQuery('');
+    history.pushState({}, '', '/');
+    setPage('home');
     setStatus('Returned to home.');
   };
 
@@ -251,8 +261,26 @@ export default function App() {
     withFrame((windowRef) => windowRef.location.reload());
   };
 
+  const searchForm = (
+    <form className="search-shell" onSubmit={handleSubmit}>
+      <input
+        type="text"
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+        className="search-input"
+        placeholder="Search freely in Linux Hub"
+        autoComplete="off"
+        spellCheck="false"
+        aria-label="Search freely in Linux Hub"
+      />
+      <button className="search-button" type="submit" aria-label="Search" disabled={isSubmitting}>
+        <SearchIcon />
+      </button>
+    </form>
+  );
+
   return (
-    <main className={`shell minimal-shell device-${device}`}>
+    <main className={`shell ${page === 'browser' ? 'browser-shell' : 'minimal-shell'} device-${device}`}>
       <div className="backdrop-grid" aria-hidden="true" />
       <header className="top-bar">
         <LinuxLogo />
@@ -299,25 +327,18 @@ export default function App() {
         </div>
       </header>
 
-      <section className={`search-center ${hasContent ? 'with-content' : ''}`} aria-label="Search">
-        <form className="search-shell" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            className="search-input"
-            placeholder="Search freely in Linux Hub"
-            autoComplete="off"
-            spellCheck="false"
-            aria-label="Search freely in Linux Hub"
-          />
-          <button className="search-button" type="submit" aria-label="Search" disabled={isSubmitting}>
-            <SearchIcon />
-          </button>
-        </form>
-        <p className={statusTone}>{status}</p>
+      {page === 'home' ? (
+        <section className="search-center" aria-label="Search">
+          {searchForm}
+          <p className={statusTone}>{status}</p>
+        </section>
+      ) : (
+        <div className="browser-page">
+          <div className="search-bar-slim">
+            {searchForm}
+            <p className={statusTone}>{status}</p>
+          </div>
 
-        {hasContent && (
           <section className="browser-panel" aria-label="Embedded browser">
             <div className="tab-row">
               <div className="nav-controls">
@@ -374,14 +395,14 @@ export default function App() {
             <iframe
               ref={frameRef}
               key={`${activeTab.id}-${activeTab.reloadKey}`}
-              src={activeTab.url}
+              src={activeTab.url || 'about:blank'}
               className="proxy-frame"
               title={activeTab.title || 'Linux Hub tab'}
               onLoad={() => setStatus('Page loaded in embedded view.')}
             />
           </section>
-        )}
-      </section>
+        </div>
+      )}
     </main>
   );
 }

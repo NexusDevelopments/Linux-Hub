@@ -11,6 +11,23 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- SharedWorker polyfill: must run before any ES module so bare-mux
+         can use it even in Safari, mobile, and private-browsing contexts. -->
+    <script>
+      if (typeof SharedWorker === 'undefined') {
+        window.SharedWorker = function SharedWorkerPolyfill(url) {
+          var w = new Worker(url);
+          this.port = {
+            start: function () {},
+            postMessage: function (msg, xfer) { w.postMessage(msg, xfer); },
+            addEventListener: function (ev, fn) { w.addEventListener(ev, fn); },
+            removeEventListener: function (ev, fn) { w.removeEventListener(ev, fn); },
+          };
+          var self = this;
+          w.onmessage = function (e) { if (self.port.onmessage) self.port.onmessage(e); };
+        };
+      }
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
   </html>

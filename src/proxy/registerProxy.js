@@ -3,29 +3,6 @@ import { makeCodec } from './codec';
 
 let proxyReadyPromise;
 
-// SharedWorker is not available in Safari, mobile browsers, or private modes.
-// Polyfill it so BareMuxConnection can still work using a regular Worker.
-const ensureSharedWorker = () => {
-  if (typeof SharedWorker !== 'undefined') {
-    return;
-  }
-
-  window.SharedWorker = class FakeSharedWorker {
-    constructor(url) {
-      const worker = new Worker(url);
-      this.port = {
-        start() {},
-        postMessage: (msg, transfer) => worker.postMessage(msg, transfer),
-        addEventListener: (ev, fn) => worker.addEventListener(ev, fn),
-        removeEventListener: (ev, fn) => worker.removeEventListener(ev, fn),
-      };
-      worker.onmessage = (e) => {
-        this.port.onmessage?.(e);
-      };
-    }
-  };
-};
-
 const getWispEndpoint = () => {
   const configured = import.meta.env.VITE_WISP_URL;
 
@@ -61,8 +38,6 @@ export const ensureProxyReady = async () => {
     }
 
     await loadScramjetController();
-
-    ensureSharedWorker();
 
     const { ScramjetController } = window.$scramjetLoadController();
 
