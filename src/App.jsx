@@ -2,6 +2,21 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { ensureProxyReady } from './proxy/registerProxy';
 import { processInput, SEARCH_ENGINES } from './proxy/processUrl';
 
+const detectDevice = () => {
+  const ua = navigator.userAgent.toLowerCase();
+  const width = window.innerWidth;
+
+  if (/iphone|android.+mobile|windows phone|ipod/i.test(ua) || width < 768) {
+    return 'mobile';
+  }
+
+  if (/ipad|tablet|android(?!.*mobile)|kindle/i.test(ua) || width < 1100) {
+    return 'tablet';
+  }
+
+  return 'desktop';
+};
+
 const makeTab = (title = 'New Tab') => ({
   id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
   title,
@@ -90,6 +105,7 @@ export default function App() {
   const [searchEngine, setSearchEngine] = useState('duckduckgo');
   const [theme, setTheme] = useState('noir');
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [device, setDevice] = useState(() => detectDevice());
   const [tabs, setTabs] = useState([makeTab('Start')]);
   const [activeTabId, setActiveTabId] = useState(null);
   const frameRef = useRef(null);
@@ -128,6 +144,12 @@ export default function App() {
       setActiveTabId(tabs[0].id);
     }
   }, [activeTabId, tabs]);
+
+  useEffect(() => {
+    const updateDevice = () => setDevice(detectDevice());
+    window.addEventListener('resize', updateDevice);
+    return () => window.removeEventListener('resize', updateDevice);
+  }, []);
 
   const statusTone = useMemo(() => (isReady ? 'status status-ready' : 'status'), [isReady]);
   const activeTab = useMemo(() => tabs.find((tab) => tab.id === activeTabId) || tabs[0], [tabs, activeTabId]);
@@ -230,7 +252,7 @@ export default function App() {
   };
 
   return (
-    <main className="shell minimal-shell">
+    <main className={`shell minimal-shell device-${device}`}>
       <div className="backdrop-grid" aria-hidden="true" />
       <header className="top-bar">
         <LinuxLogo />

@@ -380,6 +380,28 @@ input {
   border-color: var(--line-strong);
 }
 
+.device-mobile .linux-logo-text {
+  display: none;
+}
+
+.device-mobile .search-shell {
+  width: min(96vw, 760px);
+}
+
+.device-mobile .browser-panel {
+  width: 96vw;
+  height: 68vh;
+}
+
+.device-tablet .search-shell {
+  width: min(94vw, 980px);
+}
+
+.device-tablet .browser-panel {
+  width: min(96vw, 1080px);
+  height: min(70vh, 740px);
+}
+
 @keyframes float-in {
   from {
     opacity: 0;

@@ -13,16 +13,6 @@ const getWispEndpoint = () => {
   return `${window.location.protocol === 'http:' ? 'ws:' : 'wss:'}//${window.location.host}/wisp/`;
 };
 
-const waitForController = () =>
-  new Promise((resolve) => {
-    if (navigator.serviceWorker.controller) {
-      resolve();
-      return;
-    }
-
-    navigator.serviceWorker.addEventListener('controllerchange', () => resolve(), { once: true });
-  });
-
 const loadScramjetController = async () => {
   if (window.$scramjetLoadController) {
     return;
@@ -71,9 +61,8 @@ export const ensureProxyReady = async () => {
       window.scr.init();
     }
 
+    // Toro V1 behavior: register scoped SW and proceed without waiting for controller on '/'.
     await navigator.serviceWorker.register('/s_sw.js', { scope: '/ham/' });
-    await navigator.serviceWorker.ready;
-    await waitForController();
 
     const connection = new BareMuxConnection(new URL('/baremux/worker.js', window.location.origin).href);
 
