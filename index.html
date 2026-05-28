@@ -16,15 +16,9 @@
     <script>
       if (typeof SharedWorker === 'undefined') {
         window.SharedWorker = function SharedWorkerPolyfill(url) {
-          var w = new Worker(url);
-          this.port = {
-            start: function () {},
-            postMessage: function (msg, xfer) { w.postMessage(msg, xfer); },
-            addEventListener: function (ev, fn) { w.addEventListener(ev, fn); },
-            removeEventListener: function (ev, fn) { w.removeEventListener(ev, fn); },
-          };
-          var self = this;
-          w.onmessage = function (e) { if (self.port.onmessage) self.port.onmessage(e); };
+          var worker = new Worker(url);
+          worker.start = function () {};
+          this.port = worker;
         };
       }
     </script>
