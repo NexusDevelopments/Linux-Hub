@@ -1,6 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ensureProxyReady } from './proxy/registerProxy';
-import { processInput, SEARCH_ENGINES } from './proxy/processUrl';
+import { OptionsProvider, useOptions } from './utils/optionsContext';
+import { process } from './utils/hooks/loader/utils';
+import useReg from './utils/hooks/loader/useReg';
+import './index.css';
+
+const SEARCH_ENGINES = {
+  duckduckgo: { name: 'DuckDuckGo', url: 'https://duckduckgo.com/?q=' },
+  brave: { name: 'Brave', url: 'https://search.brave.com/search?q=' },
+  startpage: { name: 'Startpage', url: 'https://www.startpage.com/sp/search?q=' },
+  google: { name: 'Google', url: 'https://www.google.com/search?q=' },
+};
 
 const detectDevice = () => {
   const ua = navigator.userAgent.toLowerCase();
@@ -24,117 +33,32 @@ const makeTab = (title = 'New Tab') => ({
   reloadKey: 0,
 });
 
-function LinuxLogo() {
-  return (
-    <a className="linux-logo" href="https://www.linux.org" target="_blank" rel="noreferrer" aria-label="Linux home">
-      <img
-        src="https://upload.wikimedia.org/wikipedia/commons/3/35/Tux.svg"
-        alt="Linux"
-        className="linux-logo-image"
-      />
-      <span className="linux-logo-text">Linux Hub</span>
-    </a>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="search-icon">
-      <circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" strokeWidth="2" />
-      <path d="m16 16 5 5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function SettingsIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="settings-icon">
-      <path
-        d="M19.4 13a7.9 7.9 0 0 0 .04-2l2.06-1.6-2-3.46-2.5 1a7.95 7.95 0 0 0-1.73-1l-.38-2.65h-4l-.38 2.65a7.95 7.95 0 0 0-1.73 1l-2.5-1-2 3.46L4.56 11a7.9 7.9 0 0 0 .04 2l-2.06 1.6 2 3.46 2.5-1a7.95 7.95 0 0 0 1.73 1l.38 2.65h4l.38-2.65a7.95 7.95 0 0 0 1.73-1l2.5 1 2-3.46Zm-7.4 2.2A3.2 3.2 0 1 1 12 8.8a3.2 3.2 0 0 1 0 6.4Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
-
-function ArrowLeftIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="nav-icon">
-      <path d="M14.5 6 8.5 12l6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function ArrowRightIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="nav-icon">
-      <path d="m9.5 6 6 6-6 6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function RefreshIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="nav-icon">
-      <path
-        d="M19 7v5h-5M5 17v-5h5m8.3-1.6A6.5 6.5 0 0 0 7 7.9M5.7 13.6A6.5 6.5 0 0 0 17 16.1"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function HomeIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="nav-icon">
-      <path d="m4 11 8-7 8 7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      <path d="M7 10v9h10v-9" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-export default function App() {
+function LinuxHubShell() {
+  const { options, updateOption } = useOptions();
   const [query, setQuery] = useState('');
-  const [status, setStatus] = useState('Booting the proxy tunnel...');
-  const [isReady, setIsReady] = useState(false);
+  const [status, setStatus] = useState('Booting proxy runtime...');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [searchEngine, setSearchEngine] = useState('duckduckgo');
-  const [theme, setTheme] = useState('noir');
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [theme, setTheme] = useState('noir');
   const [device, setDevice] = useState(() => detectDevice());
   const [page, setPage] = useState(() => (window.location.pathname === '/algebra' ? 'browser' : 'home'));
   const [tabs, setTabs] = useState([makeTab('Start')]);
   const [activeTabId, setActiveTabId] = useState(null);
+  const [engine, setEngine] = useState('duckduckgo');
   const frameRef = useRef(null);
 
+  useReg();
+
   useEffect(() => {
-    let active = true;
+    updateOption({ prType: 'scr' });
+  }, [updateOption]);
 
-    ensureProxyReady()
-      .then(() => {
-        if (!active) {
-          return;
-        }
-
-        setIsReady(true);
-        setStatus('Proxy ready. Search freely in Linux Hub.');
-      })
-      .catch((error) => {
-        if (!active) {
-          return;
-        }
-
-        setStatus(error.message || 'Proxy failed to start.');
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
+  useEffect(() => {
+    const currentEngine =
+      Object.entries(SEARCH_ENGINES).find(([, val]) => val.url === options.engine)?.[0] || 'duckduckgo';
+    setEngine(currentEngine);
+    setStatus('Proxy ready. Search freely in Linux Hub.');
+  }, [options.engine]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -158,7 +82,6 @@ export default function App() {
     return () => window.removeEventListener('popstate', onPop);
   }, []);
 
-  const statusTone = useMemo(() => (isReady ? 'status status-ready' : 'status'), [isReady]);
   const activeTab = useMemo(() => tabs.find((tab) => tab.id === activeTabId) || tabs[0], [tabs, activeTabId]);
 
   const handleSubmit = async (event) => {
@@ -173,8 +96,8 @@ export default function App() {
     setStatus('Opening your request through Linux Hub...');
 
     try {
-      await ensureProxyReady();
-      const target = processInput(value, searchEngine);
+      const chosenEngine = SEARCH_ENGINES[engine] || SEARCH_ENGINES.duckduckgo;
+      const target = process(value, false, 'scr', chosenEngine.url);
 
       if (!target) {
         throw new Error('Enter a URL or a search term.');
@@ -196,9 +119,9 @@ export default function App() {
       history.pushState({}, '', '/algebra');
       setPage('browser');
       setStatus('Loaded in embedded tab.');
-      setIsSubmitting(false);
     } catch (error) {
       setStatus(error.message || 'Unable to open that request.');
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -261,29 +184,25 @@ export default function App() {
     withFrame((windowRef) => windowRef.location.reload());
   };
 
-  const searchForm = (
-    <form className="search-shell" onSubmit={handleSubmit}>
-      <input
-        type="text"
-        value={query}
-        onChange={(event) => setQuery(event.target.value)}
-        className="search-input"
-        placeholder="Search freely in Linux Hub"
-        autoComplete="off"
-        spellCheck="false"
-        aria-label="Search freely in Linux Hub"
-      />
-      <button className="search-button" type="submit" aria-label="Search" disabled={isSubmitting}>
-        <SearchIcon />
-      </button>
-    </form>
-  );
+  const applyEngine = (value) => {
+    const selected = SEARCH_ENGINES[value] || SEARCH_ENGINES.duckduckgo;
+    setEngine(value);
+    updateOption({ engineName: selected.name, engine: selected.url });
+  };
 
   return (
     <main className={`shell ${page === 'browser' ? 'browser-shell' : 'minimal-shell'} device-${device}`}>
       <div className="backdrop-grid" aria-hidden="true" />
+
       <header className="top-bar">
-        <LinuxLogo />
+        <a className="linux-logo" href="https://www.linux.org" target="_blank" rel="noreferrer" aria-label="Linux home">
+          <img
+            src="https://upload.wikimedia.org/wikipedia/commons/3/35/Tux.svg"
+            alt="Linux"
+            className="linux-logo-image"
+          />
+          <span className="linux-logo-text">Linux Hub</span>
+        </a>
 
         <div className="settings-wrap">
           <button
@@ -293,7 +212,7 @@ export default function App() {
             aria-label="Open settings"
             aria-expanded={settingsOpen}
           >
-            <SettingsIcon />
+            <span>⚙</span>
           </button>
 
           {settingsOpen && (
@@ -304,12 +223,12 @@ export default function App() {
               <select
                 id="search-engine"
                 className="settings-select"
-                value={searchEngine}
-                onChange={(event) => setSearchEngine(event.target.value)}
+                value={engine}
+                onChange={(event) => applyEngine(event.target.value)}
               >
-                {Object.keys(SEARCH_ENGINES).map((engine) => (
-                  <option key={engine} value={engine}>
-                    {engine}
+                {Object.keys(SEARCH_ENGINES).map((item) => (
+                  <option key={item} value={item}>
+                    {item}
                   </option>
                 ))}
               </select>
@@ -318,7 +237,6 @@ export default function App() {
                 type="button"
                 className="theme-toggle"
                 onClick={() => setTheme((current) => (current === 'noir' ? 'paper' : 'noir'))}
-                aria-label="Toggle black and white theme"
               >
                 {theme === 'noir' ? 'White Mode' : 'Black Mode'}
               </button>
@@ -329,30 +247,58 @@ export default function App() {
 
       {page === 'home' ? (
         <section className="search-center" aria-label="Search">
-          {searchForm}
-          <p className={statusTone}>{status}</p>
+          <form className="search-shell" onSubmit={handleSubmit}>
+            <input
+              type="text"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              className="search-input"
+              placeholder="Search freely in Linux Hub"
+              autoComplete="off"
+              spellCheck="false"
+              aria-label="Search freely in Linux Hub"
+            />
+            <button className="search-button" type="submit" aria-label="Search" disabled={isSubmitting}>
+              Search
+            </button>
+          </form>
+          <p className="status">{status}</p>
         </section>
       ) : (
         <div className="browser-page">
           <div className="search-bar-slim">
-            {searchForm}
-            <p className={statusTone}>{status}</p>
+            <form className="search-shell" onSubmit={handleSubmit}>
+              <input
+                type="text"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                className="search-input"
+                placeholder="Search freely in Linux Hub"
+                autoComplete="off"
+                spellCheck="false"
+                aria-label="Search freely in Linux Hub"
+              />
+              <button className="search-button" type="submit" aria-label="Search" disabled={isSubmitting}>
+                Search
+              </button>
+            </form>
+            <p className="status slim-status">{status}</p>
           </div>
 
           <section className="browser-panel" aria-label="Embedded browser">
             <div className="tab-row">
               <div className="nav-controls">
                 <button type="button" className="nav-btn" onClick={() => withFrame((w) => w.history.back())}>
-                  <ArrowLeftIcon />
+                  ←
                 </button>
                 <button type="button" className="nav-btn" onClick={() => withFrame((w) => w.history.forward())}>
-                  <ArrowRightIcon />
+                  →
                 </button>
                 <button type="button" className="nav-btn" onClick={handleRefresh}>
-                  <RefreshIcon />
+                  ↻
                 </button>
                 <button type="button" className="nav-btn" onClick={handleHome}>
-                  <HomeIcon />
+                  ⌂
                 </button>
               </div>
 
@@ -372,13 +318,6 @@ export default function App() {
                       onClick={(event) => {
                         event.stopPropagation();
                         handleCloseTab(tab.id);
-                      }}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault();
-                          event.stopPropagation();
-                          handleCloseTab(tab.id);
-                        }
                       }}
                     >
                       x
@@ -404,5 +343,13 @@ export default function App() {
         </div>
       )}
     </main>
+  );
+}
+
+export default function App() {
+  return (
+    <OptionsProvider>
+      <LinuxHubShell />
+    </OptionsProvider>
   );
 }
