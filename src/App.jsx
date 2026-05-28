@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { OptionsProvider, useOptions } from './utils/optionsContext';
 import { process } from './utils/hooks/loader/utils';
 import useReg from './utils/hooks/loader/useReg';
 import './index.css';
@@ -34,7 +33,6 @@ const makeTab = (title = 'New Tab') => ({
 });
 
 function LinuxHubShell() {
-  const { options, updateOption } = useOptions();
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('Booting proxy runtime...');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,15 +48,8 @@ function LinuxHubShell() {
   useReg();
 
   useEffect(() => {
-    updateOption({ prType: 'scr' });
-  }, [updateOption]);
-
-  useEffect(() => {
-    const currentEngine =
-      Object.entries(SEARCH_ENGINES).find(([, val]) => val.url === options.engine)?.[0] || 'duckduckgo';
-    setEngine(currentEngine);
     setStatus('Proxy ready. Search freely in Linux Hub.');
-  }, [options.engine]);
+  }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -185,9 +176,7 @@ function LinuxHubShell() {
   };
 
   const applyEngine = (value) => {
-    const selected = SEARCH_ENGINES[value] || SEARCH_ENGINES.duckduckgo;
     setEngine(value);
-    updateOption({ engineName: selected.name, engine: selected.url });
   };
 
   return (
@@ -347,9 +336,5 @@ function LinuxHubShell() {
 }
 
 export default function App() {
-  return (
-    <OptionsProvider>
-      <LinuxHubShell />
-    </OptionsProvider>
-  );
+  return <LinuxHubShell />;
 }

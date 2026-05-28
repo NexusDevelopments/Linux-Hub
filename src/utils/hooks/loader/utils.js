@@ -1,6 +1,4 @@
 import { mango } from './of.js';
-import whitelist from '/src/data/whitelist.json';
-import appsData from '/src/data/apps.json';
 
 const check = (inp, engine) => {
   const trimmed = inp.trim();
@@ -18,23 +16,9 @@ const check = (inp, engine) => {
   }
 };
 
-const scrwlist = new Set([
-  ...whitelist,
-  ...Object.values(appsData.games || {}).flatMap(cat => 
-    cat.filter(g => g.url && !g.local).map(g => {
-      try { return new URL(g.url.startsWith('http') ? g.url : `https://${g.url}`).hostname.replace(/^www\./, ''); }
-      catch { return null; }
-    }).filter(Boolean)
-  )
-]);
-
 export const process = (input, decode = false, prType, engine = "https://duckduckgo.com/?q=") => {
-  const upwefix = isStaticBuild 
-    ? new URL('./portal/k12/', location.href).pathname
-    : '/portal/k12/';
-  const eggowaffle = isStaticBuild
-    ? new URL('./ham/', location.href).pathname
-    : '/ham/';
+  const upwefix = '/portal/k12/';
+  const eggowaffle = '/ham/';
   
   let prefix;
 

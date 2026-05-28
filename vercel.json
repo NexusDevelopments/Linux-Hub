@@ -1,15 +1,15 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "buildCommand": "npm run build",
-  "functions": {
-    "api/index.js": {
-      "includeFiles": "../dist/**"
-    }
-  },
+  "outputDirectory": "dist",
   "routes": [
     {
-      "src": "/(.*)",
-      "dest": "/api/index.js"
+      "handle": "filesystem"
+    },
+    {
+      "src": "/.*",
+      "dest": "/index.html"
     }
   ]
 }
