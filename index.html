@@ -1,25 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta
-      name="description"
-      content="Linux Hub is a custom proxy search browser built on the Toro runtime backend."
-    />
+    <link rel="icon" type="image/svg+xml" href="https://upload.wikimedia.org/wikipedia/commons/3/35/Tux.svg" />
     <title>Linux Hub</title>
+    <meta name="viewport" content="initial-scale=1, width=device-width" />
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-HWLK0PZVBM"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-HWLK0PZVBM', { send_page_view: false });
+    </script>
   </head>
   <body>
     <div id="root"></div>
-    <script>
-      if (typeof SharedWorker === 'undefined') {
-        window.SharedWorker = function SharedWorkerPolyfill(url) {
-          var worker = new Worker(url);
-          worker.start = function () {};
-          this.port = worker;
-        };
+    <script type="module" src="/src/startup.jsx"></script>
+    <style>
+      body {
+        background-size: 24px 24px;
+        opacity: 1;
       }
-    </script>
-    <script type="module" src="/src/main.jsx"></script>
+    </style>
   </body>
 </html>

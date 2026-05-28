@@ -1,16 +1,29 @@
 # Linux Hub
 
-Linux Hub is a minimal React proxy landing page that reuses the Scramjet-based proxy stack used from Toro V2. 
+Linux Hub is a proxy browser frontend built on the Toro V1 runtime stack.
 
+## Highlights
 
-# Note 
- Linux Hub is created by the Owner/Dev of Toro V2
+- Black and white Linux Hub theme
+- Linux (Tux) branding across the UI
+- Scramjet + BareMux proxy runtime
+- Search-driven browsing experience
 
- The only code sourced from Toro V2 is the proxy search code to help the proxy search work, all other code was self made.
+## Development
 
- Linux Hub is in beta currently as of May 27th, 2026
+```bash
+npm install
+npm run dev
+```
 
- New updates push out every day.
- V1.01
+## Build
 
- Copyright: NexusDevelopments
+```bash
+npm run build
+```
+
+## Deploy (Vercel)
+
+- Build command: `npm run build`
+- Output directory: `dist`
+- Uses SPA fallback routes from `vercel.json`

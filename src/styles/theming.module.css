@@ -1,0 +1,239 @@
+.nav-backgroundColor,
+.searchBarColor,
+.searchResultStyle,
+.settings-panelColor,
+.settings-contentColor,
+.appsSearchColor,
+.appItemColor {
+  transition:
+    all 100ms ease-in-out,
+    box-shadow 100ms ease-in-out;
+}
+
+.searchBarColor input::placeholder,
+.appsSearchColor input::placeholder {
+  transition: color 100ms ease-in-out;
+}
+
+.appsSearchColor input {
+  transition: color 100ms ease-in-out;
+}
+
+.theme-default {
+  --nav-bg: #0c0405cc;
+  --nav-border: #3a1218;
+  --search-border: #5b1a23;
+  --search-bg: #17090b;
+  --search-ph: #dca6ad;
+  --search-color: #ffecef;
+  --settings-panel: #160708;
+  --settings-border: #45161d;
+  --apps-bg: #17090b;
+  --apps-border: #5b1a23;
+  --apps-text: #ffecef;
+  --apps-ph: #dca6ad;
+  --item-bg: #17090b;
+  --item-border: #5b1a23;
+}
+
+.theme-mocha {
+  --nav-bg: #141313b7;
+  --nav-border: #2b2222c5;
+  --search-border: #362f2f;
+  --search-bg: #241e1e;
+  --search-ph: #b8abab;
+  --search-color: #ecf6ff;
+  --settings-panel: #1f1817;
+  --settings-border: #362f2f;
+  --apps-bg: #291e1e;
+  --apps-border: #3b2e2e;
+  --apps-text: #ecf6ff;
+  --apps-ph: #bea4a4;
+  --item-bg: #271c1c;
+  --item-border: #443535;
+}
+
+.theme-dark {
+  --nav-bg: #0e0e10cc;
+  --nav-border: #22232a;
+  --search-border: #2a2a2f;
+  --search-bg: #151517;
+  --search-ph: #9ca3af;
+  --search-color: #ecf6ff;
+  --settings-panel: #121214;
+  --settings-border: #27272a;
+  --apps-bg: #151519;
+  --apps-border: #2a2a2f;
+  --apps-text: #f8fafc;
+  --apps-ph: #9ca3af;
+  --item-bg: #151519;
+  --item-border: #2a2a2f;
+}
+
+.theme-light {
+  --nav-bg: #ffffffcc;
+  --nav-border: #e5e7eb;
+  --search-border: #d1d5db;
+  --search-bg: #ffffff;
+  --search-ph: #374151;
+  --search-color: #1a1a1a;
+  --settings-panel: #f8fafc;
+  --settings-border: #e5e7eb;
+  --apps-bg: #ffffffb3;
+  --apps-border: #e5e7eb;
+  --apps-text: #111827;
+  --apps-ph: #374151;
+  --item-bg: #ffffff;
+  --item-border: #e5e7eb;
+}
+
+.theme-forest {
+  --nav-bg: #0f1a13b7;
+  --nav-border: #1e2e24c5;
+  --search-border: #2a4937;
+  --search-bg: #14221a;
+  --search-ph: #a9cbb6;
+  --search-color: #ecf6ff;
+  --settings-panel: #121d16;
+  --settings-border: #2a4937;
+  --apps-bg: #15261c;
+  --apps-border: #2f4f3c;
+  --apps-text: #ecfff3;
+  --apps-ph: #a9cbb6;
+  --item-bg: #15261c;
+  --item-border: #2f4f3c;
+}
+
+.theme-stellar {
+  --nav-bg: #02030ecc;
+  --nav-border: #2f3350;
+  --search-border: #232538;
+  --search-bg: #171927;
+  --search-ph: #adb2e1;
+  --search-color: #e2e5ff;
+  --settings-panel: #151624;
+  --settings-border: #2d2f44;
+  --apps-bg: #181a26;
+  --apps-border: #2d2f44;
+  --apps-text: #d6daff;
+  --apps-ph: #acb0d1;
+  --item-bg: #1d1f2d;
+  --item-border: #08090f;
+}
+
+.theme-paper {
+  --nav-bg: #fff9ece6;
+  --nav-border: #e8e2cf;
+  --search-border: #e6dec7;
+  --search-bg: #fffaf2;
+  --search-ph: #4b5563;
+  --search-color: #1a1a1a;
+  --settings-panel: #faf4e6;
+  --settings-border: #ebe3cd;
+  --apps-bg: #fffcf3;
+  --apps-border: #eae1ca;
+  --apps-text: #1f2937;
+  --apps-ph: #4b5563;
+  --item-bg: #fffbef;
+  --item-border: #e6dec7;
+}
+
+.nav-backgroundColor {
+  background-color: var(--nav-bg);
+  border-bottom: 1px solid var(--nav-border);
+}
+
+.searchBarColor {
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.06));
+  backdrop-filter: blur(14px) saturate(145%);
+  -webkit-backdrop-filter: blur(14px) saturate(145%);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.searchBarColor input {
+  color: var(--search-color);
+}
+
+.searchBarColor input::placeholder {
+  color: var(--search-ph);
+}
+
+.searchResultStyle {
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(14px) saturate(145%);
+  -webkit-backdrop-filter: blur(14px) saturate(145%);
+}
+
+.settings-panelColor {
+  background-color: var(--settings-panel);
+  border-right: 1px solid var(--settings-border);
+}
+
+.appsSearchColor {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  border-radius: 9999px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.appsSearchColor:focus-within {
+  border-color: rgba(255, 255, 255, 0.45);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.28);
+}
+
+.appsSearchColor input {
+  color: var(--apps-text);
+  border: none;
+}
+
+.appsSearchColor input::placeholder {
+  color: var(--apps-ph);
+}
+
+.glassButton {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.glassButton:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+  transform: translateY(-1px);
+}
+
+.glassButton:active {
+  transform: translateY(0);
+}
+
+.glassPill {
+  border-radius: 9999px;
+}
+
+.glassIconButton {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(10px) saturate(140%);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glassIconButton:hover {
+  border-color: rgba(255, 255, 255, 0.42);
+  transform: translateY(-1px);
+}
+
+.appItemColor {
+  background-color: var(--item-bg);
+  border: 1px solid var(--item-border);
+  box-shadow: 0px 4px 20px -9px rgba(0, 0, 0, 0.25);
+}
