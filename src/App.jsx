@@ -2,23 +2,16 @@ import { useEffect, useMemo, useState } from 'react';
 import { ensureProxyReady } from './proxy/registerProxy';
 import { processInput, SEARCH_ENGINES } from './proxy/processUrl';
 
-function LinuxPenguin() {
+function LinuxLogo() {
   return (
-    <svg viewBox="0 0 160 160" className="penguin-mark" aria-hidden="true">
-      <ellipse cx="80" cy="84" rx="42" ry="52" fill="#fff" />
-      <ellipse cx="80" cy="82" rx="30" ry="39" fill="#000" />
-      <ellipse cx="65" cy="66" rx="8" ry="10" fill="#fff" />
-      <ellipse cx="95" cy="66" rx="8" ry="10" fill="#fff" />
-      <circle cx="66" cy="68" r="3.5" fill="#000" />
-      <circle cx="94" cy="68" r="3.5" fill="#000" />
-      <path d="M80 78 94 87 80 95 66 87Z" fill="#fff" />
-      <path d="M62 107c7 10 29 10 36 0" fill="none" stroke="#fff" strokeWidth="6" strokeLinecap="round" />
-      <ellipse cx="44" cy="87" rx="10" ry="25" fill="#000" transform="rotate(16 44 87)" />
-      <ellipse cx="116" cy="87" rx="10" ry="25" fill="#000" transform="rotate(-16 116 87)" />
-      <ellipse cx="66" cy="136" rx="10" ry="6" fill="#fff" transform="rotate(-12 66 136)" />
-      <ellipse cx="94" cy="136" rx="10" ry="6" fill="#fff" transform="rotate(12 94 136)" />
-      <circle cx="80" cy="80" r="74" fill="none" stroke="rgba(255,255,255,0.14)" strokeWidth="4" strokeDasharray="5 8" />
-    </svg>
+    <a className="linux-logo" href="https://www.linux.org" target="_blank" rel="noreferrer" aria-label="Linux home">
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/3/35/Tux.svg"
+        alt="Linux"
+        className="linux-logo-image"
+      />
+      <span className="linux-logo-text">Linux Hub</span>
+    </a>
   );
 }
 
@@ -31,6 +24,17 @@ function SearchIcon() {
   );
 }
 
+function SettingsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="settings-icon">
+      <path
+        d="M19.4 13a7.9 7.9 0 0 0 .04-2l2.06-1.6-2-3.46-2.5 1a7.95 7.95 0 0 0-1.73-1l-.38-2.65h-4l-.38 2.65a7.95 7.95 0 0 0-1.73 1l-2.5-1-2 3.46L4.56 11a7.9 7.9 0 0 0 .04 2l-2.06 1.6 2 3.46 2.5-1a7.95 7.95 0 0 0 1.73 1l.38 2.65h4l.38-2.65a7.95 7.95 0 0 0 1.73-1l2.5 1 2-3.46Zm-7.4 2.2A3.2 3.2 0 1 1 12 8.8a3.2 3.2 0 0 1 0 6.4Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 export default function App() {
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('Booting the proxy tunnel...');
@@ -38,6 +42,7 @@ export default function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchEngine, setSearchEngine] = useState('duckduckgo');
   const [theme, setTheme] = useState('noir');
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -97,21 +102,54 @@ export default function App() {
   };
 
   return (
-    <main className="shell">
+    <main className="shell minimal-shell">
       <div className="backdrop-grid" aria-hidden="true" />
-      <section className="hero-card">
-        <div className="brand-lockup">
-          <LinuxPenguin />
-          <div>
-            <p className="eyebrow">Black and white proxy portal</p>
-            <h1>Linux Hub</h1>
-          </div>
+      <header className="top-bar">
+        <LinuxLogo />
+
+        <div className="settings-wrap">
+          <button
+            type="button"
+            className="settings-trigger"
+            onClick={() => setSettingsOpen((open) => !open)}
+            aria-label="Open settings"
+            aria-expanded={settingsOpen}
+          >
+            <SettingsIcon />
+          </button>
+
+          {settingsOpen && (
+            <div className="settings-popover" aria-label="Search settings">
+              <label className="settings-label" htmlFor="search-engine">
+                Engine
+              </label>
+              <select
+                id="search-engine"
+                className="settings-select"
+                value={searchEngine}
+                onChange={(event) => setSearchEngine(event.target.value)}
+              >
+                {Object.keys(SEARCH_ENGINES).map((engine) => (
+                  <option key={engine} value={engine}>
+                    {engine}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                type="button"
+                className="theme-toggle"
+                onClick={() => setTheme((current) => (current === 'noir' ? 'paper' : 'noir'))}
+                aria-label="Toggle black and white theme"
+              >
+                {theme === 'noir' ? 'White Mode' : 'Black Mode'}
+              </button>
+            </div>
+          )}
         </div>
+      </header>
 
-        <p className="hero-copy">
-          A stripped-back landing page focused on one thing: getting you where you want to go.
-        </p>
-
+      <section className="search-center" aria-label="Search">
         <form className="search-shell" onSubmit={handleSubmit}>
           <input
             type="text"
@@ -127,34 +165,6 @@ export default function App() {
             <SearchIcon />
           </button>
         </form>
-
-        <div className="settings-row" aria-label="Search settings">
-          <label className="settings-label" htmlFor="search-engine">
-            Engine
-          </label>
-          <select
-            id="search-engine"
-            className="settings-select"
-            value={searchEngine}
-            onChange={(event) => setSearchEngine(event.target.value)}
-          >
-            {Object.keys(SEARCH_ENGINES).map((engine) => (
-              <option key={engine} value={engine}>
-                {engine}
-              </option>
-            ))}
-          </select>
-
-          <button
-            type="button"
-            className="theme-toggle"
-            onClick={() => setTheme((current) => (current === 'noir' ? 'paper' : 'noir'))}
-            aria-label="Toggle black and white theme"
-          >
-            {theme === 'noir' ? 'White Mode' : 'Black Mode'}
-          </button>
-        </div>
-
         <p className={statusTone}>{status}</p>
       </section>
     </main>

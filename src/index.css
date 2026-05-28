@@ -61,9 +61,87 @@ input {
   position: relative;
   min-height: 100vh;
   padding: 32px 20px;
+  overflow: hidden;
+}
+
+.minimal-shell {
+  display: flex;
+  flex-direction: column;
+}
+
+.top-bar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.linux-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--fg);
+}
+
+.linux-logo-image {
+  width: 36px;
+  height: 36px;
+}
+
+.linux-logo-text {
+  font-size: 1.1rem;
+  letter-spacing: 0.03em;
+}
+
+.settings-wrap {
+  position: relative;
+}
+
+.settings-trigger {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--fg);
+  width: 42px;
+  height: 42px;
   display: grid;
   place-items: center;
-  overflow: hidden;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.settings-trigger:hover,
+.settings-trigger:focus-visible {
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.settings-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.settings-popover {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: min(280px, 78vw);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--panel-strong), #000 12%);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.38);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.search-center {
+  flex: 1;
+  display: grid;
+  place-items: center;
 }
 
 .backdrop-grid {
@@ -78,56 +156,6 @@ input {
   pointer-events: none;
 }
 
-.hero-card {
-  position: relative;
-  width: min(100%, 760px);
-  padding: 40px 28px;
-  border: 1px solid var(--line);
-  border-radius: 28px;
-  background: linear-gradient(180deg, var(--panel), rgba(255, 255, 255, 0.02));
-  box-shadow:
-    0 20px 80px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(18px);
-}
-
-.brand-lockup {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-
-.penguin-mark {
-  width: 88px;
-  height: 88px;
-  flex: none;
-  filter: drop-shadow(0 8px 24px rgba(255, 255, 255, 0.1));
-  animation: float-in 0.9s ease both;
-}
-
-.eyebrow {
-  margin: 0 0 8px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--muted);
-  font-size: 0.72rem;
-}
-
-h1 {
-  margin: 0;
-  font-size: clamp(2.8rem, 7vw, 4.8rem);
-  line-height: 0.95;
-  letter-spacing: -0.06em;
-}
-
-.hero-copy {
-  margin: 22px 0 28px;
-  max-width: 40rem;
-  color: var(--muted);
-  font-size: 1rem;
-  line-height: 1.6;
-}
-
 .search-shell {
   position: relative;
   display: flex;
@@ -137,6 +165,7 @@ h1 {
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--panel);
+  width: min(92vw, 820px);
   transition:
     transform 180ms ease,
     border-color 180ms ease,
@@ -199,21 +228,14 @@ h1 {
 }
 
 .status {
-  margin: 18px 0 0;
+  margin: 14px 0 0;
   color: var(--muted);
   min-height: 1.5rem;
+  text-align: center;
 }
 
 .status-ready {
   color: var(--fg);
-}
-
-.settings-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 14px;
-  flex-wrap: wrap;
 }
 
 .settings-label {
@@ -263,17 +285,8 @@ h1 {
 }
 
 @media (max-width: 640px) {
-  .hero-card {
-    padding: 28px 18px;
-  }
-
-  .brand-lockup {
-    align-items: flex-start;
-  }
-
-  .penguin-mark {
-    width: 74px;
-    height: 74px;
+  .shell {
+    padding: 16px 12px;
   }
 
   .search-shell {
